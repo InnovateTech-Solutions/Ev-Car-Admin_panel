@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Movie</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <form id="editForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="genre">Genre:</label>
+        <input type="text" id="genre" name="genre" required>
+
+        <label for="releaseDate">Release Date:</label>
+        <input type="date" id="releaseDate" name="releaseDate" required>
+
+        <button type="button" onclick="editMovie()">Save Changes</button>
+    </form>
+
+    <script>
+        function editMovie() {
+            // Fetch input values
+            var editedMovie = {
+                id:16 ,  // Replace with the actual id
+                name: document.getElementById('name').value,
+                title: document.getElementById('title').value,
+                genre: document.getElementById('genre').value,
+                releaseDate: document.getElementById('releaseDate').value
+            };
+
+            // Make PUT request
+            fetch(`https://apiservicesavxav.azurewebsites.net/api/Movies/${editedMovie.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(editedMovie)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Movie updated successfully:', data);
+                // Handle success or redirect to another page
+            })
+            .catch(error => {
+                console.error('Error updating movie:', error);
+                // Handle error
+            });
+        }
+    </script>
+</body>
+</html>

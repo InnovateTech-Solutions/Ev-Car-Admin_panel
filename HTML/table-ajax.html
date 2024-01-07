@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .add-new-btn, .delete-btn, .edit-btn {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 5px 10px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    .delete-btn, .edit-btn {
+      background-color: #708090;
+    }
+  </style>
+  <title>Movies Table</title>
+</head>
+<body>
+
+  <h1>Movies List</h1>
+
+  <!-- Add New Movie Button -->
+  <button class="add-new-btn" onclick="navigateToAddMovie()">Add New Movie</button>
+
+  <table id="movieTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Title</th>
+        <th>Genre</th>
+        <th>Release Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    function navigateToAddMovie() {
+      // Redirect to the add movie page
+      window.location.href = 'add_movie.html';
+    }
+
+    function fetchMovies() {
+      fetch('https://apiservicesavxav.azurewebsites.net/api/Movies')
+        .then(response => response.json())
+        .then(data => {
+          const tableBody = document.querySelector('#movieTable tbody');
+          tableBody.innerHTML = ''; // Clear previous data
+
+          data.forEach(movie => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+              <td>${movie.id}</td>
+              <td>${movie.name}</td>
+              <td>${movie.title}</td>
+              <td>${movie.genre}</td>
+              <td>${movie.releaseDate}</td>
+              <td>
+                <button class="edit-btn" onclick="editMovie(${movie.id})">Edit</button>
+                <button class="delete-btn" onclick="deleteMovie(${movie.id})">Delete</button>
+              </td>
+            `;
+
+            tableBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error fetching movies:', error));
+    }
+
+    function editMovie(id) {
+      // Redirect to the movie edit page with the specific movie ID
+      window.location.href = `movie_edit.html?id=${id}`;
+    }
+
+    function deleteMovie(id) {
+      const tableBody = document.querySelector('#movieTable tbody');
+      
+      // Perform the delete request using AJAX
+      fetch(`https://apiservicesavxav.azurewebsites.net/api/Movies?id=${id}`, {
+        method: 'DELETE',
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Movie deleted:', data);
+
+        // Remove the deleted movie row from the table
+        const rowToDelete = tableBody.querySelector(`tr td:first-child:contains("${id}")`).parentNode;
+        tableBody.removeChild(rowToDelete);
+      })
+      .catch(error => console.error('Error deleting movie:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initial fetch on page load
+      fetchMovies();
+    });
+  </script>
+
+</body>
+</html>
